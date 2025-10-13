@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #3c20f3;
+  --primary-dark: #d96c0a;
+  --accent: #f4ede7;
+  --bg: transparent;
+  --text: #1c140d;
+  --muted: #9c7049;
+  --success: #07880e;
+  --danger: #e71008;
+  --warning: #f38524;
+  
+  /* Definição do gradiente de fundo */
+  --bg-gradient-start: #061723;
+  --bg-gradient-end: #153654;
+  --bg-gradient: linear-gradient(to right, var(--bg-gradient-start), var(--bg-gradient-end));
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'Noto Sans', Arial, sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
