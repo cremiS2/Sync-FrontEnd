@@ -153,4 +153,77 @@ export interface CUDModalProps {
   fields: FormField[];
   initialData?: Record<string, any>;
   onSubmit: (data: Record<string, any>) => void;
-} 
+}
+
+// Stock (Estoque)
+export interface Stock {
+  id: number;
+  codigo: string;
+  nome: string;
+  categoria: string;
+  quantidade: number;
+  unidade: string;
+  precoUnitario: number;
+  fornecedor: string;
+  dataEntrada: string;
+  dataValidade: string;
+  localizacao: string;
+  status: string;
+  descricao: string;
+}
+
+export interface StockDTO {
+  codigo: string;
+  nome: string;
+  categoria: string;
+  quantidade: number;
+  unidade: string;
+  precoUnitario: number;
+  fornecedor: string;
+  dataEntrada: string;
+  dataValidade: string;
+  localizacao: string;
+  status: string;
+  descricao: string;
+}
+
+// User (Usuário)
+export interface User {
+  id: number;
+  email: string;
+  username?: string;
+  roles: Array<{ id: number; name: string }>;
+  createdAt?: string;
+}
+
+export interface UserDTO {
+  email: string;
+  password: string;
+  roles: string[];
+}
+
+// Machine Model (Modelo de Máquina)
+export interface MachineModel {
+  id: number;
+  modelName: string;
+  modelDescription: string;
+}
+
+export interface MachineModelDTO {
+  modelName: string;
+  modelDescription: string;
+}
+
+// Allocated Employee Machine (Alocação Funcionário-Máquina)
+export interface AllocatedEmployeeMachine {
+  id: number;
+  employee: Employee;
+  machine: Machine;
+  allocatedAt?: string;
+  allocatedBy?: User;
+}
+
+export interface AllocatedEmployeeMachineDTO {
+  employee: number;
+  machine: number;
+}

@@ -90,4 +90,26 @@ export function deleteMachine(id: number): Promise<void> {
     });
 }
 
-
+/**
+ * Gera relatório PDF de máquinas
+ * @returns Promise com Blob do PDF
+ */
+export function generateMachineReport(): Promise<Blob> {
+  if (DEBUG_API) console.log('[machines] generateMachineReport');
+  
+  return http
+    .get(`${API_ENDPOINTS.MACHINE}/relatorio`, {
+      responseType: 'blob', // Importante para receber arquivo binário
+    })
+    .then((res: any) => {
+      if (DEBUG_API) console.log('[machines] generateMachineReport OK');
+      return res.data;
+    })
+    .catch((err: any) => {
+      console.error('[machines] generateMachineReport FAIL:', { 
+        status: err?.response?.status, 
+        data: err?.response?.data 
+      });
+      throw err;
+    });
+}

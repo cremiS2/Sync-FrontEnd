@@ -55,6 +55,7 @@ export const API_ENDPOINTS = {
   MACHINE: '/machine',
   MACHINE_MODEL: '/machine-model',
   ALLOCATED_EMPLOYEE_MACHINE: '/allocated-employee-machine',
+  STOCK: '/stock',
 } as const;
 
 // Pagination

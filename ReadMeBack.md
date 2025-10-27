@@ -7,6 +7,7 @@
 - [Configuração e Instalação](#configuração-e-instalação)
 - [Autenticação e Autorização](#autenticação-e-autorização)
 - [Endpoints da API](#endpoints-da-api)
+- [Relatórios em PDF](#relatórios-em-pdf)
 - [Modelos de Dados](#modelos-de-dados)
 - [Códigos de Status HTTP](#códigos-de-status-http)
 - [Exemplos de Requisições](#exemplos-de-requisições)
@@ -15,9 +16,11 @@
 
 ## 🎯 Visão Geral
 
-O **Sync Backend** é uma API REST desenvolvida em Spring Boot para gerenciamento de operações industriais. O sistema permite controlar departamentos, setores, máquinas, funcionários, estoque e alocações de funcionários em máquinas.
+O **Sync Backend** é uma API REST desenvolvida em Spring Boot para gerenciamento de operações industriais. O sistema permite controlar departamentos, setores, máquinas, funcionários, estoque e alocações de funcionários em máquinas. Integrado com frontend hospedado no Vercel, oferece geração de relatórios em PDF e autenticação JWT.
 
 **Base URL**: `http://localhost:8080` (desenvolvimento)
+
+**Frontend**: `https://fronttcc-v6al.vercel.app` (produção)
 
 **Documentação Swagger**: `http://localhost:8080/swagger-ui/index.html`
 
@@ -67,6 +70,12 @@ src/main/java/com/projeto/tcc/
 ├── repository/         # Repositórios JPA
 ├── security/           # Configurações de segurança
 └── service/            # Lógica de negócio
+
+src/main/resources/
+├── relatorios/         # Templates JasperReports (.jrxml)
+├── chave_privada.key   # Chave privada RSA para JWT
+├── chave_publica.pub   # Chave pública RSA para JWT
+└── application.yml     # Configurações da aplicação
 ```
 
 ---
@@ -241,6 +250,7 @@ Content-Type: application/json
 | GET | `/employee/{id}` | ADMIN, GERENTE | Buscar funcionário por ID |
 | PUT | `/employee/{id}` | ADMIN | Atualizar funcionário |
 | DELETE | `/employee/{id}` | ADMIN | Deletar funcionário |
+| GET | `/employee/relatorio` | ADMIN, GERENTE | Gerar relatório PDF de funcionários |
 
 **Query Parameters (GET /employee):**
 - `employee-name` - Filtrar por nome
@@ -261,6 +271,7 @@ Content-Type: application/json
 | GET | `/machine/{id}` | ADMIN, GERENTE | Buscar máquina por ID |
 | PUT | `/machine/{id}` | ADMIN | Atualizar máquina |
 | DELETE | `/machine/{id}` | ADMIN | Deletar máquina |
+| GET | `/machine/relatorio` | ADMIN, GERENTE | Gerar relatório PDF de máquinas |
 
 **Query Parameters (GET /machine):**
 - `machine-name` - Filtrar por nome
@@ -324,7 +335,72 @@ Content-Type: application/json
 
 ---
 
-## 📊 Modelos de Dados
+### � Relatórios em PDF
+
+O sistema oferece geração de relatórios em PDF utilizando **JasperReports**.
+
+#### Relatório de Funcionários
+
+| Método | Endpoint | Permissões | Descrição |
+|--------|----------|------------|-----------|
+| GET | `/employee/relatorio` | ADMIN, GERENTE | Gera PDF com lista de todos os funcionários |
+
+**Exemplo de Requisição:**
+```http
+GET /employee/relatorio
+Authorization: Bearer {seu-token}
+```
+
+**Response:** `200 OK`
+- Content-Type: `application/pdf`
+- Content-Disposition: `inline; filename=relatorio_funcionarios.pdf`
+- Body: Arquivo PDF binário
+
+**Conteúdo do Relatório:**
+- Nome do funcionário
+- ID do funcionário
+- Setor
+- Turno
+- Status
+- Disponibilidade
+
+---
+
+#### Relatório de Máquinas
+
+| Método | Endpoint | Permissões | Descrição |
+|--------|----------|------------|-----------|
+| GET | `/machine/relatorio` | ADMIN, GERENTE | Gera PDF com lista de todas as máquinas |
+
+**Exemplo de Requisição:**
+```http
+GET /machine/relatorio
+Authorization: Bearer {seu-token}
+```
+
+**Response:** `200 OK`
+- Content-Type: `application/pdf`
+- Content-Disposition: `inline; filename=relatorio_maquinas.pdf`
+- Body: Arquivo PDF binário
+
+**Conteúdo do Relatório:**
+- Nome da máquina
+- Número de série
+- Setor
+- Status
+- OEE (Overall Equipment Effectiveness)
+- Throughput
+- Última manutenção
+- Modelo da máquina
+
+**Tecnologia:**
+- **JasperReports 6.20.0** - Geração de relatórios
+- **iText 2.1.7** - Renderização de PDF
+- Templates JRXML localizados em `src/main/resources/relatorios/`
+
+---
+
+## �📊 Modelos de Dados
 
 ### UserDTO (Entrada)
 
@@ -715,6 +791,34 @@ Authorization: Bearer {seu-token}
 
 ---
 
+### 9. Gerar Relatório de Máquinas em PDF
+
+```http
+GET /machine/relatorio
+Authorization: Bearer {seu-token}
+```
+
+**Response:** `200 OK`
+- Retorna um arquivo PDF com todas as máquinas cadastradas
+- Content-Type: `application/pdf`
+- O arquivo é exibido inline no navegador
+
+---
+
+### 10. Gerar Relatório de Funcionários em PDF
+
+```http
+GET /employee/relatorio
+Authorization: Bearer {seu-token}
+```
+
+**Response:** `200 OK`
+- Retorna um arquivo PDF com todos os funcionários cadastrados
+- Content-Type: `application/pdf`
+- O arquivo é exibido inline no navegador
+
+---
+
 ## 🔒 Segurança
 
 ### CORS
@@ -722,7 +826,8 @@ Authorization: Bearer {seu-token}
 O backend está configurado para aceitar requisições de:
 - `http://localhost:*`
 - `http://127.0.0.1:*`
-- `https://fronttcc-v6al.vercel.app`
+- `http://[::1]` (IPv6 localhost)
+- `https://fronttcc-v6al.vercel.app` (Frontend em produção)
 
 ### Proteção CSRF
 
@@ -789,11 +894,14 @@ Todas as validações são feitas automaticamente pelo Bean Validation. Erros de
 
 ## 🚀 Próximos Passos / Funcionalidades em Desenvolvimento
 
-- [ ] Geração de relatórios em PDF (JasperReports)
+- [x] Geração de relatórios em PDF (JasperReports) - **Implementado**
+  - Relatório de Funcionários
+  - Relatório de Máquinas
 - [ ] Histórico de alterações de estado de máquinas
 - [ ] Endpoints para operadores
 - [ ] Métricas e dashboards
 - [ ] Notificações
+- [ ] Relatórios adicionais (Departamentos, Setores, Estoque)
 
 ---
 
@@ -811,4 +919,4 @@ Este projeto é um TCC (Trabalho de Conclusão de Curso).
 
 ---
 
-**Última atualização**: Janeiro 2024
+**Última atualização**: Outubro 2025

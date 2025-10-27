@@ -129,4 +129,28 @@ export function deleteEmployee(id: number): Promise<void> {
     });
 }
 
+/**
+ * Gera relatório PDF de funcionários
+ * @returns Promise com Blob do PDF
+ */
+export function generateEmployeeReport(): Promise<Blob> {
+  if (DEBUG_API) console.log('[employees] generateEmployeeReport');
+  
+  return http
+    .get(`${API_ENDPOINTS.EMPLOYEE}/relatorio`, {
+      responseType: 'blob', // Importante para receber arquivo binário
+    })
+    .then((res) => {
+      if (DEBUG_API) console.log('[employees] generateEmployeeReport OK');
+      return res.data;
+    })
+    .catch((err) => {
+      console.error('[employees] generateEmployeeReport FAIL:', { 
+        status: err?.response?.status, 
+        data: err?.response?.data 
+      });
+      throw err;
+    });
+}
+
 
