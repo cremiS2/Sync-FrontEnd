@@ -82,14 +82,23 @@ http.interceptors.response.use(
   (error) => {
     if (DEBUG_HTTP) {
       // eslint-disable-next-line no-console
-      console.error('[HTTP] Error:', {
-        status: error?.response?.status,
-        url: error?.config?.url,
-        method: (error?.config?.method || 'get').toUpperCase(),
-        data: error?.response?.data,
-        headers: error?.response?.headers,
-        requestHeaders: error?.config?.headers,
-        baseURL: error?.config?.baseURL
+      console.log(`[HTTP] Error:`, {
+        status: error.response?.status,
+        url: error.config?.url,
+        method: error.config?.method,
+        data: error.response?.data,
+        headers: error.config?.headers,
+        response: {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          headers: error.response?.headers,
+          data: error.response?.data,
+          config: {
+            url: error.response?.config?.url,
+            method: error.response?.config?.method,
+            data: error.response?.config?.data
+          }
+        }
       });
     }
     

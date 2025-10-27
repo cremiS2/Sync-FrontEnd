@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '../../components/layout';
 import { Card, CardContent, Avatar, Button, TextField, Switch } from '@mui/material';
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaBuilding, FaBell, FaSignOutAlt, FaEdit, FaSave, FaTimes, FaCalendar, FaUserTie, FaUsers } from 'react-icons/fa';
 import styles from '../../styles/modules/Dashboard.module.css';
 import { listEmployees } from '../../services/employees';
 import { listDepartments } from '../../services/departments';
+import { logout } from '../../services/auth';
 
 const Perfil: React.FC = () => {
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [notifications, setNotifications] = useState({
     email: true,
@@ -186,6 +189,8 @@ const Perfil: React.FC = () => {
 
   const handleLogout = () => {
     console.log('Logout realizado');
+    logout();
+    navigate('/login');
   };
 
   return (

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { signIn } from '../../services/auth';
 import styles from '../../styles/modules/Login.module.css';
 
 const Spinner = () => (
@@ -47,12 +48,19 @@ const CadastroUsuarios: React.FC = () => {
     }
     
     try {
-      // Aqui você pode adicionar a chamada à API para criar o usuário
       console.log('Cadastrando usuário:', { fullName, email, username });
       
-      // Simulando sucesso
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Chamada real para a API de cadastro
+      await signIn({
+        email,
+        password,
+        fullName,
+        username,
+        roles: ['ADMIN'] // Definindo a role padrão como ADMIN (roles válidas: ADMIN, GERENTE, OPERADOR)
+      });
+      
       setSuccess(true);
+      setError('');
       
       // Redirecionar para login após 2 segundos
       setTimeout(() => {
@@ -60,7 +68,20 @@ const CadastroUsuarios: React.FC = () => {
       }, 2000);
     } catch (err: any) {
       console.error('Erro no cadastro:', err);
-      setError('Erro ao criar conta. Tente novamente.');
+      
+      // Mensagens de erro mais específicas
+      if (err?.response?.data?.errors) {
+        // Se houver erros de validação, mostre o primeiro
+        const firstError = Object.values(err.response.data.errors)[0];
+        setError(Array.isArray(firstError) ? firstError[0] : firstError);
+      } else if (err?.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (err?.message) {
+        setError(err.message);
+      } else {
+        setError('Erro ao criar conta. Verifique os dados e tente novamente.');
+      }
+      
       setSuccess(false);
     } finally {
       setLoading(false);

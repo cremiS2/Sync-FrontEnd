@@ -1,6 +1,7 @@
 import http from './http';
 const DEBUG_API = Boolean(import.meta.env.VITE_DEBUG_API) || import.meta.env.DEV;
 import { API_ENDPOINTS, STORAGE_KEYS } from '../utils/constants';
+import { ENV_CONFIG } from '../config/environment';
 
 export interface LoginRequest {
   email: string;
@@ -15,6 +16,8 @@ export interface LoginResponse {
 export interface SignInRequest {
   email: string;
   password: string;
+  fullName?: string;
+  username?: string;
   roles?: string[];
 }
 
@@ -81,13 +84,95 @@ export async function login(credentials: LoginRequest): Promise<LoginResponse> {
 }
 
 export async function signIn(payload: SignInRequest): Promise<void> {
-  if (DEBUG_API) console.log('[auth] signIn payload:', { email: payload.email, roles: payload.roles });
+  console.log('[DEBUG] VITE_API_URL:', import.meta.env.VITE_API_URL);
+  console.log('[DEBUG] Todas as variáveis de ambiente:', import.meta.env);
+  
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+  const url = `${API_URL}${API_ENDPOINTS.SIGN_IN}`;
+  
+  console.log('[auth] signIn - Iniciando requisição para:', url);
+  console.log('[auth] signIn payload:', { 
+    email: payload.email, 
+    password: '[PROTECTED]',
+    fullName: payload.fullName,
+    username: payload.username,
+    roles: payload.roles 
+  });
+  
   try {
-    await http.post(API_ENDPOINTS.SIGN_IN, payload);
-    if (DEBUG_API) console.log('[auth] signIn OK');
+    // Preparar os dados no formato exato que o backend espera
+    const userData = {
+      email: payload.email,
+      password: payload.password,
+      fullName: payload.fullName || payload.email.split('@')[0],
+      username: payload.username || payload.email.split('@')[0],
+      roles: payload.roles || ['OPERADOR'] // Roles válidas: ADMIN, GERENTE, OPERADOR
+    };
+    
+    console.log('Enviando dados para a API:', JSON.stringify(userData, null, 2));
+    
+    // Usando fetch diretamente para ter mais controle sobre a requisição
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Origin': window.location.origin
+      },
+      mode: 'cors',
+      credentials: 'include',
+      body: JSON.stringify(userData)
+    });
+
+    console.log('[auth] signIn - Resposta recebida:', {
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries())
+    });
+
+    let responseData;
+    const contentType = response.headers.get('content-type');
+    
+    try {
+      if (contentType && contentType.includes('application/json')) {
+        responseData = await response.json();
+      } else {
+        // Se não for JSON, pegar como texto (pode ser HTML de erro)
+        const textResponse = await response.text();
+        console.error('[auth] signIn - Resposta não é JSON:', textResponse.substring(0, 500));
+        responseData = { message: 'Erro no servidor. Verifique os logs do Azure.' };
+      }
+    } catch (e) {
+      console.error('[auth] signIn - Erro ao fazer parse da resposta:', e);
+      responseData = { message: 'Erro ao processar a resposta do servidor' };
+    }
+    
+    if (!response.ok) {
+      console.error('[auth] signIn - Erro na resposta:', {
+        status: response.status,
+        statusText: response.statusText,
+        data: responseData,
+        headers: Object.fromEntries(response.headers.entries())
+      });
+      
+      throw new Error(responseData.message || `Erro ao criar conta (${response.status} ${response.statusText})`);
+    }
+
+    console.log('[auth] signIn - Sucesso:', responseData);
+    return responseData;
   } catch (err: any) {
-    console.error('[auth] signIn FAIL:', { status: err?.response?.status, data: err?.response?.data });
-    throw err;
+    console.error('[auth] signIn ERROR:', {
+      name: err.name,
+      message: err.message,
+      stack: err.stack,
+      cause: err.cause
+    });
+    
+    const errorMessage = err?.message || 'Erro ao criar conta. Verifique os dados e tente novamente.';
+    const error = new Error(errorMessage);
+    error.name = 'SignInError';
+    error.cause = err;
+    throw error;
   }
 }
 

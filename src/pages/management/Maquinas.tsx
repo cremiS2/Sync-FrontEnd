@@ -91,13 +91,6 @@ const Maquinas: React.FC = () => {
       type: 'number',
       required: true,
       placeholder: 'Ex.: 12345'
-    },
-    {
-      name: 'machineModel',
-      label: 'ID do Modelo da Máquina',
-      type: 'number',
-      required: true,
-      placeholder: 'Ex.: 2'
     }
   ];
 
@@ -161,7 +154,7 @@ const Maquinas: React.FC = () => {
         // Usar foto padrão se não tiver foto
         photo: data.photo && data.photo.trim() !== '' ? data.photo : 'https://via.placeholder.com/150x150/10b981/ffffff?text=🏢',
         serieNumber: parseInt(data.serieNumber) || 0,
-        machineModel: parseInt(data.machineModel) || 0
+        machineModel: 1 // Valor fixo padrão
       };
       console.log('DTO de criação:', dto);
       console.log('Validação dos campos:');
@@ -173,7 +166,6 @@ const Maquinas: React.FC = () => {
       console.log('- lastMaintenance:', typeof data.lastMaintenance, data.lastMaintenance);
       console.log('- photo:', typeof data.photo, data.photo);
       console.log('- serieNumber:', typeof data.serieNumber, data.serieNumber, '->', parseInt(data.serieNumber));
-      console.log('- machineModel:', typeof data.machineModel, data.machineModel, '->', parseInt(data.machineModel));
     } else {
       // Na edição, enviar apenas os campos que foram alterados
       dto = {} as Partial<MachineDTO>;
@@ -186,7 +178,6 @@ const Maquinas: React.FC = () => {
       if (data.lastMaintenance) dto.lastMaintenance = data.lastMaintenance;
       if (data.photo !== undefined) dto.photo = data.photo || undefined;
       if (data.serieNumber && !isNaN(parseInt(data.serieNumber))) dto.serieNumber = parseInt(data.serieNumber);
-      if (data.machineModel && !isNaN(parseInt(data.machineModel))) dto.machineModel = parseInt(data.machineModel);
       
       console.log('DTO de edição:', dto);
       console.log('Campos a serem enviados:', Object.keys(dto));
@@ -241,8 +232,7 @@ const Maquinas: React.FC = () => {
       throughput: machine.throughput?.toString() || '',
       lastMaintenance: machine.lastMaintenance || '',
       photo: machine.photo || '',
-      serieNumber: machine.serieNumber?.toString() || '',
-      machineModel: machine.machineModel?.toString() || '1'
+      serieNumber: machine.serieNumber?.toString() || ''
     };
     setSelectedMachineForEdit(machineData as any);
     setShowFormModal(true);
