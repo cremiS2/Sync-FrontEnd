@@ -1,0 +1,693 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Header } from '../../components/layout';
+import { Card, CardContent, Avatar, Button, TextField } from '@mui/material';
+import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaBuilding, FaSignOutAlt, FaEdit, FaSave, FaTimes, FaCalendar, FaUserTie, FaUsers, FaArrowLeft } from 'react-icons/fa';
+import styles from '../../styles/modules/Dashboard.module.css';
+import { listEmployees } from '../../services/employees';
+import { listDepartments } from '../../services/departments';
+import { logout } from '../../services/auth';
+
+const Perfil: React.FC = () => {
+  const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false);
+  
+
+  const [userStatus, setUserStatus] = useState('online'); 
+
+  const [userData, setUserData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    position: '',
+    department: '',
+    location: 'São Paulo, SP',
+    avatar: '',
+    employeeId: '',
+    startDate: '',
+    manager: '',
+    team: ''
+  });
+  const [, setLoading] = useState(true);
+
+  const [editData, setEditData] = useState(userData);
+  const [errors, setErrors] = useState({
+    email: '',
+    phone: ''
+  });
+
+  // Carregar dados reais do perfil
+  const loadProfileData = async () => {
+    try {
+      setLoading(true);
+      console.log('=== CARREGANDO DADOS DO PERFIL ===');
+      
+      // Extrair email do token JWT
+      const token = localStorage.getItem('user_token');
+      let userEmail = '';
+      
+      if (token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          userEmail = payload.sub || payload.email || '';
+          console.log('Email do usuário logado:', userEmail);
+        } catch (err) {
+          console.error('Erro ao decodificar token:', err);
+        }
+      }
+      
+      // Carregar dados dos funcionários e departamentos
+      const [employeesRes, departmentsRes] = await Promise.all([
+        listEmployees({ pageSize: 1000, pageNumber: 0 }).catch(() => ({ data: { content: [] } })),
+        listDepartments({ pageSize: 1000, pageNumber: 0 }).catch(() => ({ data: { content: [] } }))
+      ]);
+      
+      const employees = employeesRes.data.content || [];
+      const departments = departmentsRes.data.content || [];
+      
+      console.log('Dados carregados para perfil:');
+      console.log('- Funcionários:', employees.length);
+      console.log('- Departamentos:', departments.length);
+      
+      // Buscar o funcionário pelo email do usuário logado
+      const currentEmployee = employees.find(emp => emp.user?.email === userEmail) || employees[0] || {};
+      const currentDepartment = departments.find(d => d.id === currentEmployee.sector?.id) || departments[0] || {};
+      
+      console.log('Funcionário encontrado:', currentEmployee.name || 'Nenhum');
+      
+      // Gerar dados realistas baseados nos dados reais
+      const profileData = {
+        name: currentEmployee.name || 'Usuário',
+        email: userEmail || currentEmployee.user?.email || 'usuario@empresa.com',
+        phone: '(11) 99999-9999', // Pode ser adicionado ao modelo depois
+        position: getPositionFromSector(currentEmployee.sector?.name),
+        department: currentEmployee.sector?.name || currentDepartment.name || 'N/A',
+        location: 'São Paulo, SP',
+        avatar: currentEmployee.photo || 'https://via.placeholder.com/150x150/6366f1/ffffff?text=👤',
+        employeeId: `EMP-${currentEmployee.employeeID || '001'}`,
+        startDate: new Date().toLocaleDateString('pt-BR'), // Pode ser adicionado ao modelo depois
+        manager: getManagerFromDepartment(currentDepartment.name),
+        team: `Equipe ${currentEmployee.sector?.name || 'Principal'}`
+      };
+      
+      setUserData(profileData);
+      setEditData(profileData);
+      
+      console.log('Dados do perfil gerados:', profileData);
+      
+    } catch (error) {
+      console.error('Erro ao carregar dados do perfil:', error);
+      // Manter dados padrão em caso de erro
+      const defaultData = {
+        name: 'Usuário',
+        email: 'usuario@empresa.com',
+        phone: '(11) 99999-9999',
+        position: 'Funcionário',
+        department: 'Geral',
+        location: 'São Paulo, SP',
+        avatar: 'https://via.placeholder.com/150x150/6366f1/ffffff?text=👤',
+        employeeId: 'EMP-001',
+        startDate: new Date().toLocaleDateString('pt-BR'),
+        manager: 'Supervisor',
+        team: 'Equipe Principal'
+      };
+      setUserData(defaultData);
+      setEditData(defaultData);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Funções auxiliares para gerar dados realistas
+  const getPositionFromSector = (sectorName?: string) => {
+    if (!sectorName) return 'Funcionário';
+    const positions: { [key: string]: string } = {
+      'Produção': 'Operador de Produção',
+      'Qualidade': 'Analista de Qualidade',
+      'Manutenção': 'Técnico de Manutenção',
+      'Logística': 'Assistente de Logística',
+      'Administração': 'Assistente Administrativo'
+    };
+    return positions[sectorName] || `Especialista em ${sectorName}`;
+  };
+
+  const getManagerFromDepartment = (departmentName?: string) => {
+    if (!departmentName) return 'Supervisor';
+    const managers: { [key: string]: string } = {
+      'Produção': 'Carlos Silva',
+      'Qualidade': 'Ana Costa',
+      'Manutenção': 'João Santos',
+      'Logística': 'Maria Oliveira',
+      'Administração': 'Pedro Almeida'
+    };
+    return managers[departmentName] || `Supervisor de ${departmentName}`;
+  };
+
+  // Carregar dados iniciais
+  useEffect(() => {
+    loadProfileData();
+  }, []);
+
+  const handleEdit = () => {
+    setEditData(userData);
+    setIsEditing(true);
+  };
+
+  const handleSave = () => {
+    // Validar antes de salvar
+    const newErrors = {
+      email: editData.email && !validateEmail(editData.email) ? 'Email inválido' : '',
+      phone: editData.phone && !validatePhone(editData.phone) ? 'Telefone inválido' : ''
+    };
+
+    setErrors(newErrors);
+
+    // Se houver erros, não salvar
+    if (newErrors.email || newErrors.phone) {
+      return;
+    }
+
+    setUserData(editData);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditData(userData);
+    setErrors({ email: '', phone: '' });
+    setIsEditing(false);
+  };
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = (phone: string): boolean => {
+    // Remove todos os caracteres não numéricos
+    const cleanPhone = phone.replace(/\D/g, '');
+    // Aceita telefones com 10 ou 11 dígitos (com ou sem DDD)
+    return cleanPhone.length >= 10 && cleanPhone.length <= 11;
+  };
+
+  const formatPhone = (value: string): string => {
+    // Remove tudo que não é número
+    const numbers = value.replace(/\D/g, '');
+    
+    // Limita a 11 dígitos
+    const limited = numbers.slice(0, 11);
+    
+    // Se não tem nada, retorna vazio
+    if (limited.length === 0) return '';
+    
+    // Formata o telefone progressivamente
+    if (limited.length <= 2) {
+      return `(${limited}`;
+    } else if (limited.length <= 6) {
+      return `(${limited.slice(0, 2)}) ${limited.slice(2)}`;
+    } else if (limited.length <= 10) {
+      return `(${limited.slice(0, 2)}) ${limited.slice(2, 6)}-${limited.slice(6)}`;
+    } else {
+      return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(7)}`;
+    }
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    let newValue = value;
+    let newErrors = { ...errors };
+
+    // Validação específica por campo
+    if (field === 'email') {
+      if (value && !validateEmail(value)) {
+        newErrors.email = 'Email inválido';
+      } else {
+        newErrors.email = '';
+      }
+    }
+
+    if (field === 'phone') {
+      // Formata o telefone enquanto digita
+      newValue = formatPhone(value);
+      
+      // Valida o telefone
+      if (value && !validatePhone(value)) {
+        newErrors.phone = 'Telefone inválido. Use formato: (XX) XXXXX-XXXX';
+      } else {
+        newErrors.phone = '';
+      }
+    }
+
+    setErrors(newErrors);
+    setEditData(prev => ({
+      ...prev,
+      [field]: newValue
+    }));
+  };
+
+  
+
+  const handleStatusChange = (newStatus: string) => {
+    setUserStatus(newStatus);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'online': return 'var(--success)';
+      case 'busy': return 'var(--warning)';
+      case 'away': return 'var(--primary)';
+      case 'offline': return 'var(--muted)';
+      default: return 'var(--success)';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'online': return 'Online';
+      case 'busy': return 'Ocupado';
+      case 'away': return 'Ausente';
+      case 'offline': return 'Offline';
+      default: return 'Online';
+    }
+  };
+
+
+
+  const handleLogout = () => {
+    console.log('Logout realizado');
+    logout();
+    navigate('/login');
+  };
+
+  return (
+    <div className={styles.container}>
+      <Header />
+      <main className={styles.main}>
+        <div className={styles.content}>
+          <div className="mt-20 mb-4">
+            <Button
+              variant="outlined"
+              startIcon={<FaArrowLeft />}
+              onClick={() => navigate(-1)}
+              sx={{
+                color: 'var(--muted)',
+                borderColor: 'var(--muted)',
+                '&:hover': {
+                  backgroundColor: 'var(--muted)',
+                  color: 'white',
+                  borderColor: 'var(--muted)'
+                }
+              }}
+            >
+              Voltar
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+            <div className="xl:col-span-3 space-y-6">
+              <Card className="shadow-lg border-0">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold text-[var(--primary)] flex items-center gap-2">
+                      <FaUser className="text-[var(--primary)]" />
+                      Informações Pessoais
+                    </h2>
+                    {!isEditing ? (
+                      <Button
+                        variant="outlined"
+                        startIcon={<FaEdit />}
+                        onClick={handleEdit}
+                        sx={{
+                          color: 'var(--primary)',
+                          borderColor: 'var(--primary)',
+                          '&:hover': {
+                            backgroundColor: 'var(--primary)',
+                            color: 'white',
+                            borderColor: 'var(--primary)',
+                          },
+                        }}
+                      >
+                        Editar
+                      </Button>
+                    ) : (
+                      <div className="flex gap-2">
+                        <Button
+                          variant="contained"
+                          startIcon={<FaSave />}
+                          onClick={handleSave}
+                          sx={{
+                            backgroundColor: 'var(--primary)',
+                            '&:hover': {
+                              backgroundColor: 'var(--primary-dark)',
+                            },
+                          }}
+                        >
+                          Salvar
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          startIcon={<FaTimes />}
+                          onClick={handleCancel}
+                          sx={{
+                            color: 'var(--muted)',
+                            borderColor: 'var(--muted)',
+                            '&:hover': {
+                              backgroundColor: 'var(--muted)',
+                              color: 'white',
+                              borderColor: 'var(--muted)',
+                            },
+                          }}
+                        >
+                          Cancelar
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="p-4 bg-[var(--accent)] rounded-lg">
+                        <label className="block text-sm font-medium text-[var(--muted)] mb-2 flex items-center gap-2">
+                          <FaUser className="text-[var(--primary)]" />
+                          Nome Completo
+                        </label>
+                        {isEditing ? (
+                          <TextField
+                            fullWidth
+                            value={editData.name}
+                            onChange={(e) => handleInputChange('name', e.target.value)}
+                            variant="outlined"
+                            size="small"
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                backgroundColor: 'white',
+                              },
+                            }}
+                          />
+                        ) : (
+                          <p className="text-[var(--text)] font-medium">{userData.name}</p>
+                        )}
+                      </div>
+
+                      <div className="p-4 bg-[var(--accent)] rounded-lg">
+                        <label className="block text-sm font-medium text-[var(--muted)] mb-2 flex items-center gap-2">
+                          <FaEnvelope className="text-[var(--primary)]" />
+                          Email
+                        </label>
+                        {isEditing ? (
+                          <TextField
+                            fullWidth
+                            value={editData.email}
+                            onChange={(e) => handleInputChange('email', e.target.value)}
+                            variant="outlined"
+                            size="small"
+                            type="email"
+                            error={!!errors.email}
+                            helperText={errors.email}
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                backgroundColor: 'white',
+                              },
+                            }}
+                          />
+                        ) : (
+                          <p className="text-[var(--text)] font-medium">{userData.email}</p>
+                        )}
+                      </div>
+
+                      <div className="p-4 bg-[var(--accent)] rounded-lg">
+                        <label className="block text-sm font-medium text-[var(--muted)] mb-2 flex items-center gap-2">
+                          <FaPhone className="text-[var(--primary)]" />
+                          Telefone
+                        </label>
+                        {isEditing ? (
+                          <TextField
+                            fullWidth
+                            value={editData.phone}
+                            onChange={(e) => handleInputChange('phone', e.target.value)}
+                            variant="outlined"
+                            size="small"
+                            error={!!errors.phone}
+                            helperText={errors.phone}
+                            placeholder="(XX) XXXXX-XXXX"
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                backgroundColor: 'white',
+                              },
+                            }}
+                          />
+                        ) : (
+                          <p className="text-[var(--text)] font-medium">{userData.phone}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="p-4 bg-[var(--accent)] rounded-lg">
+                        <label className="block text-sm font-medium text-[var(--muted)] mb-2 flex items-center gap-2">
+                          <FaUser className="text-[var(--primary)]" />
+                          Cargo
+                        </label>
+                        {isEditing ? (
+                          <TextField
+                            fullWidth
+                            value={editData.position}
+                            onChange={(e) => handleInputChange('position', e.target.value)}
+                            variant="outlined"
+                            size="small"
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                backgroundColor: 'white',
+                              },
+                            }}
+                          />
+                        ) : (
+                          <p className="text-[var(--text)] font-medium">{userData.position}</p>
+                        )}
+                      </div>
+
+                      <div className="p-4 bg-[var(--accent)] rounded-lg">
+                        <label className="block text-sm font-medium text-[var(--muted)] mb-2 flex items-center gap-2">
+                          <FaBuilding className="text-[var(--primary)]" />
+                          Departamento
+                        </label>
+                        {isEditing ? (
+                          <TextField
+                            fullWidth
+                            value={editData.department}
+                            onChange={(e) => handleInputChange('department', e.target.value)}
+                            variant="outlined"
+                            size="small"
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                backgroundColor: 'white',
+                              },
+                            }}
+                          />
+                        ) : (
+                          <p className="text-[var(--text)] font-medium">{userData.department}</p>
+                        )}
+                      </div>
+
+                      <div className="p-4 bg-[var(--accent)] rounded-lg">
+                        <label className="block text-sm font-medium text-[var(--muted)] mb-2 flex items-center gap-2">
+                          <FaMapMarkerAlt className="text-[var(--primary)]" />
+                          Localização
+                        </label>
+                        {isEditing ? (
+                          <TextField
+                            fullWidth
+                            value={editData.location}
+                            onChange={(e) => handleInputChange('location', e.target.value)}
+                            variant="outlined"
+                            size="small"
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                backgroundColor: 'white',
+                              },
+                            }}
+                          />
+                        ) : (
+                          <p className="text-[var(--text)] font-medium">{userData.location}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-lg border-0">
+                <CardContent className="p-6">
+                  <h2 className="text-xl font-semibold text-[var(--primary)] mb-6 flex items-center gap-2">
+                    <FaBuilding className="text-[var(--primary)]" />
+                    Informações Profissionais
+                  </h2>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="p-4 bg-[var(--accent)] rounded-lg">
+                        <label className="block text-sm font-medium text-[var(--muted)] mb-2 flex items-center gap-2">
+                          <FaUser className="text-[var(--primary)]" />
+                          ID do Funcionário
+                        </label>
+                        <p className="text-[var(--text)] font-medium">{userData.employeeId}</p>
+                      </div>
+
+                      <div className="p-4 bg-[var(--accent)] rounded-lg">
+                        <label className="block text-sm font-medium text-[var(--muted)] mb-2 flex items-center gap-2">
+                          <FaCalendar className="text-[var(--primary)]" />
+                          Data de Admissão
+                        </label>
+                        <p className="text-[var(--text)] font-medium">{userData.startDate}</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="p-4 bg-[var(--accent)] rounded-lg">
+                        <label className="block text-sm font-medium text-[var(--muted)] mb-2 flex items-center gap-2">
+                          <FaUserTie className="text-[var(--primary)]" />
+                          Gerente
+                        </label>
+                        <p className="text-[var(--text)] font-medium">{userData.manager}</p>
+                      </div>
+
+                      <div className="p-4 bg-[var(--accent)] rounded-lg">
+                        <label className="block text-sm font-medium text-[var(--muted)] mb-2 flex items-center gap-2">
+                          <FaUsers className="text-[var(--primary)]" />
+                          Equipe
+                        </label>
+                        <p className="text-[var(--text)] font-medium">{userData.team}</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="space-y-6 xl:col-span-1">
+              <Card className="shadow-lg border-0 bg-gradient-to-br from-[var(--accent)] to-[var(--accent)]">
+                <CardContent className="p-6 text-center">
+                  <div className="relative inline-block mb-4">
+                    <Avatar
+                      src={userData.avatar}
+                      alt={userData.name}
+                      sx={{ 
+                        width: 120, 
+                        height: 120, 
+                        margin: '0 auto',
+                        border: '4px solid white',
+                        boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+                        cursor: 'pointer',
+                        transition: 'transform 0.2s',
+                        '&:hover': {
+                          transform: 'scale(1.05)',
+                        }
+                      }}
+                    />
+                  </div>
+                  <h3 className="text-xl font-semibold text-[var(--primary)] mb-1">{userData.name}</h3>
+                  <p className="text-[var(--muted)] mb-3">{userData.position}</p>
+                  
+  
+                  <div className="mb-4">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <div 
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: getStatusColor(userStatus) }}
+                      ></div>
+                      <span className="text-sm font-medium text-[var(--text)]">
+                        {getStatusText(userStatus)}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[var(--muted)]">
+                      Clique no indicador para alterar
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-2 text-sm text-[var(--muted)]">
+                    <FaBuilding className="text-[var(--primary)]" />
+                    <span>{userData.department}</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-lg border-0">
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold text-[var(--primary)] mb-4 flex items-center gap-2">
+                    <FaUser className="text-[var(--primary)]" />
+                    Status
+                  </h3>
+
+                  <div className="space-y-3">
+                    {['online', 'busy', 'away', 'offline'].map((status) => (
+                      <div
+                        key={status}
+                        className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                          userStatus === status 
+                            ? 'bg-[var(--primary)] text-white' 
+                            : 'bg-[var(--accent)] hover:bg-[var(--primary)] hover:text-white'
+                        }`}
+                        onClick={() => handleStatusChange(status)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div 
+                            className="w-3 h-3 rounded-full"
+                            style={{ 
+                              backgroundColor: userStatus === status ? 'white' : getStatusColor(status)
+                            }}
+                          ></div>
+                          <div>
+                            <div className="font-medium">{getStatusText(status)}</div>
+                            <div className="text-xs opacity-80">
+                              {status === 'online' && 'Disponível para contato'}
+                              {status === 'busy' && 'Em reunião ou ocupado'}
+                              {status === 'away' && 'Temporariamente ausente'}
+                              {status === 'offline' && 'Indisponível'}
+                            </div>
+                          </div>
+                        </div>
+                        {userStatus === status && (
+                          <div className="text-xs opacity-80">✓ Ativo</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              
+              <Card className="shadow-lg border-0 bg-gradient-to-br from-red-50 to-red-100">
+                <CardContent className="p-6">
+                  <div className="text-center mb-4">
+                    <div className="w-12 h-12 bg-[var(--danger)] rounded-full flex items-center justify-center mx-auto mb-3">
+                      <FaSignOutAlt className="text-white text-lg" />
+                    </div>
+                    <h4 className="font-semibold text-[var(--text)] mb-1">Sair da Conta</h4>
+                    <p className="text-sm text-[var(--muted)]">Encerrar sessão atual</p>
+                  </div>
+                  <Button
+                    variant="outlined"
+                    startIcon={<FaSignOutAlt />}
+                    onClick={handleLogout}
+                    fullWidth
+                    sx={{
+                      color: 'var(--danger)',
+                      borderColor: 'var(--danger)',
+                      '&:hover': {
+                        backgroundColor: 'var(--danger)',
+                        color: 'white',
+                        borderColor: 'var(--danger)',
+                      },
+                    }}
+                  >
+                    Sair da Conta
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default Perfil; 
