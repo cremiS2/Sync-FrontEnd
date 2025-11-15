@@ -50,32 +50,28 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
       label: 'Funcionários',
       icon: FaUsers,
       group: 'management',
-      route: '/funcionarios',
-      requiredRole: 'ADMIN,GERENTE' // OPERADOR não tem acesso
+      route: '/funcionarios'
     },
     {
       id: 'machines',
       label: 'Máquinas',
       icon: FaIndustry,
       group: 'management',
-      route: '/maquinas',
-      requiredRole: 'ADMIN,GERENTE' // OPERADOR não tem acesso
+      route: '/maquinas'
     },
     {
       id: 'departments',
       label: 'Departamentos',
       icon: FaBuilding,
       group: 'management',
-      route: '/departamentos',
-      requiredRole: 'ADMIN,GERENTE' // OPERADOR não tem acesso
+      route: '/departamentos'
     },
     {
       id: 'reports',
       label: 'Relatórios',
       icon: FaFileAlt,
       group: 'management',
-      route: '/relatorios',
-      requiredRole: 'ADMIN,GERENTE' // OPERADOR não tem acesso
+      route: '/relatorios'
     },
     {
       id: 'inventory',
