@@ -3,11 +3,6 @@
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { Link } from "react-router-dom"
-import { prefetch, CACHE_KEYS } from "../../utils/dataCache"
-import { listMachines } from "../../services/machines"
-import { listEmployees } from "../../services/employees"
-import { listDepartments } from "../../services/departments"
-import { listSectors } from "../../services/sectors"
 
 const getInitialTheme = (): boolean => {
   try {
