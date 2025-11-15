@@ -80,29 +80,29 @@ const App: React.FC = () => {
                 <Routes>
                   <Route path="/" element={<LandingPage />} />
                   <Route path="/login" element={<Login />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/estatisticas" element={<Estatisticas />} />
+                  <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                  <Route path="/estatisticas" element={<ProtectedRoute><Estatisticas /></ProtectedRoute>} />
                   <Route path="/funcionarios" element={
-                    <ProtectedRoute requiredRole="ADMIN,GERENTE">
+                    <ProtectedRoute>
                       <Funcionarios />
                     </ProtectedRoute>
                   } />
                   <Route path="/departamentos" element={
-                    <ProtectedRoute requiredRole="ADMIN,GERENTE">
+                    <ProtectedRoute>
                       <Departamentos />
                     </ProtectedRoute>
                   } />
                   <Route path="/maquinas" element={
-                    <ProtectedRoute requiredRole="ADMIN,GERENTE">
+                    <ProtectedRoute>
                       <Maquinas />
                     </ProtectedRoute>
                   } />
-                  <Route path="/perfil" element={<Perfil />} />
-                  <Route path="/usuarios" element={<Usuarios />} />
-                  <Route path="/manutencao" element={<Manutencao />} />
-                  <Route path="/alertas-logs" element={<AlertasLogs />} />
+                  <Route path="/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
+                  <Route path="/usuarios" element={<ProtectedRoute><Usuarios /></ProtectedRoute>} />
+                  <Route path="/manutencao" element={<ProtectedRoute><Manutencao /></ProtectedRoute>} />
+                  <Route path="/alertas-logs" element={<ProtectedRoute><AlertasLogs /></ProtectedRoute>} />
                   <Route path="/relatorios" element={
-                    <ProtectedRoute requiredRole="ADMIN,GERENTE">
+                    <ProtectedRoute>
                       <Relatorios />
                     </ProtectedRoute>
                   } />
@@ -112,9 +112,9 @@ const App: React.FC = () => {
                       <AdminDashboard />
                     </ProtectedRoute>
                   } />
-                  <Route path="/cadastro-usuarios" element={<CadastroUsuarios />} />
-                  <Route path="/atribuicoes" element={<Atribuicoes />} />
-                  <Route path="/estoque" element={<Estoque />} />
+                  <Route path="/cadastro-usuarios" element={<ProtectedRoute><CadastroUsuarios /></ProtectedRoute>} />
+                  <Route path="/atribuicoes" element={<ProtectedRoute><Atribuicoes /></ProtectedRoute>} />
+                  <Route path="/estoque" element={<ProtectedRoute><Estoque /></ProtectedRoute>} />
                   <Route path="/esqueceu-senha" element={<EsqueceuSenha />} />
                   <Route path="/diferenciais" element={<Diferenciais />} />
                   <Route path="/sobre" element={<Sobre />} />
