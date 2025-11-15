@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from '../../styles/modules/Login.module.css';
+import { forgotPassword, resetPassword } from '../../services/auth';
 
 const Spinner = () => (
   <div className="flex justify-center items-center mt-4">
@@ -21,25 +22,34 @@ const EsqueceuSenha: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    
+    if (!email.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) {
+      setError('E-mail inválido.');
+      return;
+    }
+    
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      if (!email.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) {
-        setError('E-mail inválido.');
-        return;
-      }
+    try {
+      await forgotPassword(email);
+      setSuccess('E-mail verificado com sucesso!');
       setStep(2);
-    }, 1000);
+    } catch (err: any) {
+      const errorMessage = err?.response?.data?.message || err?.message || 'Erro ao verificar e-mail. Tente novamente.';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    
     if (newPassword.length < 6) {
       setError('A senha deve ter pelo menos 6 caracteres.');
       return;
@@ -48,12 +58,18 @@ const EsqueceuSenha: React.FC = () => {
       setError('As senhas não coincidem.');
       return;
     }
+    
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await resetPassword(email, newPassword);
       setSuccess('Senha redefinida com sucesso!');
       setTimeout(() => navigate('/login'), 1800);
-    }, 1200);
+    } catch (err: any) {
+      const errorMessage = err?.response?.data?.message || err?.message || 'Erro ao redefinir senha. Tente novamente.';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

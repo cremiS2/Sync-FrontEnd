@@ -430,8 +430,14 @@ const Maquinas: React.FC = () => {
   }, []);
 
   const totalMachines = machines.length;
-  const operatingMachines = machines.filter(m => m.status === 'operando').length;
-  const maintenanceMachines = machines.filter(m => m.status === 'manutencao').length;
+  const operatingMachines = machines.filter(m => {
+    const status = m.status?.toUpperCase() || '';
+    return status === 'OPERANDO' || status === 'OPERATING' || status === 'ACTIVE';
+  }).length;
+  const maintenanceMachines = machines.filter(m => {
+    const status = m.status?.toUpperCase() || '';
+    return status === 'MANUTENÇÃO' || status === 'MANUTENCAO' || status === 'MAINTENANCE' || status === 'EM_MANUTENCAO';
+  }).length;
 
   const averageOEE = machines.length ? Math.round(machines.reduce((sum, m) => sum + (m.oee * 100), 0) / machines.length) : 0;
 

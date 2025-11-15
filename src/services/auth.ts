@@ -243,4 +243,58 @@ export function isAuthenticated(): boolean {
   return Boolean(getToken());
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  newPassword: string;
+}
+
+export interface ForgotPasswordResponse {
+  message: string;
+}
+
+export interface ResetPasswordResponse {
+  message: string;
+}
+
+export async function forgotPassword(email: string): Promise<ForgotPasswordResponse> {
+  if (DEBUG_API) console.log('[auth] forgotPassword payload:', { email });
+  
+  try {
+    const { data } = await http.post<ForgotPasswordResponse>(API_ENDPOINTS.FORGOT_PASSWORD, { email });
+    if (DEBUG_API) console.log('[auth] forgotPassword OK:', data);
+    return data;
+  } catch (err: any) {
+    console.error('[auth] forgotPassword FAIL:', { 
+      status: err?.response?.status, 
+      data: err?.response?.data,
+      message: err?.response?.data?.message || err?.response?.data?.menssagem
+    });
+    throw err;
+  }
+}
+
+export async function resetPassword(email: string, newPassword: string): Promise<ResetPasswordResponse> {
+  if (DEBUG_API) console.log('[auth] resetPassword payload:', { email, newPasswordLength: newPassword.length });
+  
+  try {
+    const { data } = await http.post<ResetPasswordResponse>(API_ENDPOINTS.RESET_PASSWORD, { 
+      email, 
+      newPassword 
+    });
+    if (DEBUG_API) console.log('[auth] resetPassword OK:', data);
+    return data;
+  } catch (err: any) {
+    console.error('[auth] resetPassword FAIL:', { 
+      status: err?.response?.status, 
+      data: err?.response?.data,
+      message: err?.response?.data?.message || err?.response?.data?.menssagem
+    });
+    throw err;
+  }
+}
+
 

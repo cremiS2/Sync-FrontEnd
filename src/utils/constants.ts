@@ -48,6 +48,8 @@ export const STATUS_COLORS = {
 export const API_ENDPOINTS = {
   LOGIN: '/login',
   SIGN_IN: '/sign-in',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password',
   USER: '/user',
   EMPLOYEE: '/employee',
   SECTOR: '/sector',

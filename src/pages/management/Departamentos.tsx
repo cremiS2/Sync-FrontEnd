@@ -276,6 +276,10 @@ const Departamentos: React.FC = () => {
         if (selectedDepartment) {
           await loadSectorsForDepartment(selectedDepartment.id);
         }
+        
+        // Recarregar departamentos para atualizar o orçamento total
+        await loadDepartments(true);
+        
         notification.success('Setor removido com sucesso!', 'Sucesso');
       } catch (error: any) {
         console.error('Erro ao deletar setor:', error);

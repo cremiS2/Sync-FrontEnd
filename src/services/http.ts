@@ -20,7 +20,7 @@ export const http: AxiosInstance = axios.create({
 
 http.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   // Endpoints públicos que não precisam de autenticação
-  const publicEndpoints = ['/login', '/sign-in'];
+  const publicEndpoints = ['/login', '/sign-in', '/forgot-password', '/reset-password'];
   const isPublicEndpoint = publicEndpoints.some(endpoint => config.url?.includes(endpoint));
   
   const token = localStorage.getItem(STORAGE_KEYS.USER_TOKEN);

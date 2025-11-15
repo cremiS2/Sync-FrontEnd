@@ -253,16 +253,6 @@ const Dashboard: React.FC = () => {
 
   // Gerar dados dos gráficos baseados nos dados reais
   const chartData = {
-    // NOTA: Dados de produção mensal são ESTIMATIVAS baseadas no throughput atual das máquinas
-    // Para dados históricos reais, seria necessário um endpoint no backend que retorne produção por mês
-    production: [
-      { label: 'Jan', value: 0, color: '#3B82F6' },  // Dados históricos não disponíveis
-      { label: 'Fev', value: 0, color: '#10B981' },
-      { label: 'Mar', value: 0, color: '#F59E0B' },
-      { label: 'Abr', value: 0, color: '#EF4444' },
-      { label: 'Mai', value: 0, color: '#8B5CF6' },
-      { label: 'Jun', value: Math.round(stats.monthlyProduction), color: '#06B6D4' }  // Apenas mês atual (estimativa)
-    ],
     departments: [
       { label: 'Ativos', value: stats.activeDepartments, color: '#10B981' },
       { label: 'Inativos', value: stats.totalDepartments - stats.activeDepartments, color: '#EF4444' }
@@ -540,20 +530,6 @@ const Dashboard: React.FC = () => {
               <div className={`rounded-2xl shadow-sm border p-6 hover:shadow-lg transition-all duration-300 ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
                 }`}>
                 <h3 className={`text-xl font-bold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"
-                  }`}>Produção Mensal</h3>
-                <div style={{ height: '300px', width: '100%' }}>
-                  <BasicChart
-                    title=""
-                    data={chartData.production}
-                    type="bar"
-                    height={280}
-                    noCard={true}
-                  />
-                </div>
-              </div>
-              <div className={`rounded-2xl shadow-sm border p-6 hover:shadow-lg transition-all duration-300 ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-                }`}>
-                <h3 className={`text-xl font-bold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"
                   }`}>Distribuição por Departamento</h3>
                 <div style={{ height: '300px', width: '100%' }}>
                   <BasicChart
@@ -565,8 +541,6 @@ const Dashboard: React.FC = () => {
                   />
                 </div>
               </div>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
               <div className={`rounded-2xl shadow-sm border p-6 hover:shadow-lg transition-all duration-300 ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
                 }`}>
                 <h3 className={`text-xl font-bold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"
