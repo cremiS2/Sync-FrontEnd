@@ -1,0 +1,10 @@
+{
+  "server": {
+    "host": "172.20.10.2",
+    "port": 8000
+  },
+  "wifi": {
+    "ssid": "iPhone de Kauã",
+    "password": "kaua1234"
+  }
+}

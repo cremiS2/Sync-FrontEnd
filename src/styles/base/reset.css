@@ -1,0 +1,203 @@
+.MuiOutlinedInput-root {
+  background-color: var(--input-bg) !important;
+  color: var(--input-text) !important;
+}
+
+.MuiOutlinedInput-notchedOutline {
+  border-color: var(--input-border) !important;
+}
+
+.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: var(--primary) !important;
+}
+
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: var(--primary) !important;
+}
+
+.MuiInputBase-input::placeholder {
+  color: var(--input-placeholder) !important;
+  opacity: 1;
+}
+
+.MuiFormLabel-root {
+  color: var(--muted) !important;
+}
+
+/* Prevent common overflow issues and ensure media scale */
+html, body {
+  overflow-x: hidden;
+}
+
+img, svg, video, canvas, iframe {
+  max-width: 100%;
+  height: auto;
+}
+:root {
+  --primary: #118dda;
+  --primary-dark: #063a57;
+  --accent: #a7cbef;
+  --bg: #a8c3fa;
+  --text: #07050f;
+  --muted: #05021b;
+  --success: #07880e;
+  --danger: #e71008;
+  --warning: #f38524;
+  /* Inputs (light) */
+  --input-bg: #ffffff;
+  --input-text: #111827;
+  --input-border: #cbd5e1;
+  --input-placeholder: #6b7280;
+  
+  /* Novas cores de background com gradiente */
+  --bg-gradient-start: #99c7c9;   
+  --bg-gradient-end: #2546be;
+  --bg-gradient:linear-gradient(to right, var(--bg-gradient-start), var(--bg-gradient-end));
+}
+
+
+
+.dark {
+  --primary: #05567b;
+  --primary-dark: #063a57;
+  --accent: #38332f;
+  --bg: #0b0b0b;
+  --text: #e5e7eb;
+  --muted: #cbd5e1;
+  --success: #07880e;
+  --danger: #e71008;
+  --warning: #f38524;
+  /* Inputs (dark) */
+  --input-bg: #1f2937; /* slate-800 */
+  --input-text: #e5e7eb;
+  --input-border: #374151; /* slate-700 */
+  --input-placeholder: #9ca3af;
+  
+  /* Novas cores de background com gradiente para tema escuro */
+  --bg-gradient-start: #0a2a4a;
+  --bg-gradient-end: #05567b;
+  --bg-gradient: linear-gradient(to right, var(--bg-gradient-start), var(--bg-gradient-end));
+}
+
+/* Dark mode: force MUI Cards to use dark surfaces */
+.dark .MuiCard-root {
+  background-color: var(--accent) !important;
+  color: var(--text) !important;
+}
+
+.dark .MuiCardContent-root {
+  background-color: transparent !important;
+  color: var(--text) !important;
+}
+
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+  box-sizing: border-box;
+}
+
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+body {
+  line-height: 1.5;
+  background: var(--bg-gradient);
+  color: var(--text);
+  font-family: 'Inter', 'Noto Sans', Arial, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+ol, ul {
+  list-style: none;
+}
+blockquote, q {
+  quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+button {
+  cursor: pointer;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.fade-in {
+  animation: fade-in 0.7s ease;
+}
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up {
+  animation: fade-in-up 0.7s cubic-bezier(.39,.575,.565,1) both;
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.scale-in {
+  animation: scale-in 0.5s cubic-bezier(.39,.575,.565,1) both;
+}
+
+
+/* Forçar cores visíveis na seção Nosso Time - modo escuro */
+.dark .bg-gray-800 span,
+.dark .dark\:bg-gray-800 span {
+  color: #cbd5e1 !important;
+}
+
+.dark .bg-gray-800 p,
+.dark .dark\:bg-gray-800 p {
+  color: #f1f5f9 !important;
+}
+
+.dark .bg-gray-800 h3,
+.dark .dark\:bg-gray-800 h3 {
+  color: #60a5fa !important;
+}
+
+.dark .bg-gray-800 a,
+.dark .dark\:bg-gray-800 a {
+  color: #60a5fa !important;
+}
