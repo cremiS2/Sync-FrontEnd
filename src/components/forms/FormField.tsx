@@ -62,13 +62,6 @@ const formatCurrency = (value: number): string => {
   });
 };
 
-const parseCurrencyToNumber = (value: string): number => {
-  // Remove tudo exceto números
-  const numbers = value.replace(/\D/g, '');
-  // Converte para número com 2 casas decimais
-  return parseInt(numbers || '0', 10) / 100;
-};
-
 const FormField: React.FC<FormFieldProps> = ({
   type,
   label,
