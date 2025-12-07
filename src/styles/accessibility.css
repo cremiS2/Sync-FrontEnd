@@ -1,0 +1,472 @@
+/**
+ * Estilos de Acessibilidade
+ * Melhorias visuais para acessibilidade WCAG 2.1 Level AA
+ */
+
+/* Screen Reader Only - Oculta visualmente mas mantém acessível para leitores de tela */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Torna visível quando focado (útil para skip links) */
+.sr-only:focus,
+.sr-only:active {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Melhor indicador de foco para todos os elementos interativos */
+*:focus-visible {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Foco específico para botões */
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Foco para inputs */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 1px;
+  border-color: #3b82f6;
+}
+
+/* Skip Link - Link para pular navegação */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #3b82f6;
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 0 0 4px 0;
+  z-index: 9999;
+  font-weight: 600;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Indicador de loading acessível */
+[aria-busy="true"] {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+[aria-busy="true"]::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid #3b82f6;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mensagens de erro acessíveis */
+[role="alert"],
+[aria-live="assertive"] {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin: 8px 0;
+  font-weight: 500;
+}
+
+[role="alert"].error,
+[aria-live="assertive"].error {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border-left: 4px solid #dc2626;
+}
+
+[role="alert"].success {
+  background-color: #d1fae5;
+  color: #065f46;
+  border-left: 4px solid #10b981;
+}
+
+[role="alert"].warning {
+  background-color: #fef3c7;
+  color: #92400e;
+  border-left: 4px solid #f59e0b;
+}
+
+[role="alert"].info {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border-left: 4px solid #3b82f6;
+}
+
+/* Melhor contraste para texto desabilitado */
+:disabled,
+[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Indicador visual para campos obrigatórios */
+[required]::after,
+[aria-required="true"]::after {
+  content: " *";
+  color: #dc2626;
+  font-weight: bold;
+}
+
+/* Melhor feedback visual para checkboxes e radios */
+input[type="checkbox"]:focus,
+input[type="radio"]:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Tooltips acessíveis */
+[role="tooltip"] {
+  position: absolute;
+  background: #1f2937;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  z-index: 1000;
+  max-width: 250px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+[role="tooltip"]::before {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #1f2937;
+}
+
+/* Melhor contraste para links */
+a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* Indicador de página atual em navegação */
+[aria-current="page"] {
+  font-weight: 700;
+  position: relative;
+}
+
+[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #3b82f6;
+}
+
+/* Melhor feedback para botões - apenas botões principais (submit, etc) */
+button[type="submit"]:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Respeitar preferência de movimento reduzido */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Melhor contraste em modo escuro */
+.dark [role="alert"].error {
+  background-color: #7f1d1d;
+  color: #fecaca;
+}
+
+.dark [role="alert"].success {
+  background-color: #064e3b;
+  color: #a7f3d0;
+}
+
+.dark [role="alert"].warning {
+  background-color: #78350f;
+  color: #fde68a;
+}
+
+.dark [role="alert"].info {
+  background-color: #1e3a8a;
+  color: #bfdbfe;
+}
+
+/* Melhor visibilidade de foco em modo escuro */
+.dark *:focus-visible {
+  outline-color: #60a5fa;
+}
+
+/* Tabelas acessíveis */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  text-align: left;
+  font-weight: 600;
+  background-color: #f3f4f6;
+}
+
+.dark th {
+  background-color: #374151;
+}
+
+/* Melhor espaçamento para leitura */
+p {
+  line-height: 1.6;
+  max-width: 70ch;
+}
+
+/* Tamanho mínimo de toque (44x44px) para mobile */
+@media (max-width: 768px) {
+  button,
+  a,
+  input[type="checkbox"],
+  input[type="radio"],
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Indicador de progresso acessível */
+[role="progressbar"] {
+  position: relative;
+  height: 8px;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+[role="progressbar"]::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: #3b82f6;
+  width: var(--progress, 0%);
+  transition: width 0.3s ease;
+}
+
+/* Melhor feedback para drag and drop */
+[draggable="true"] {
+  cursor: move;
+}
+
+[draggable="true"]:focus {
+  outline: 2px dashed #3b82f6;
+  outline-offset: 4px;
+}
+
+/* Accordion acessível */
+[aria-expanded="false"] + * {
+  display: none;
+}
+
+[aria-expanded="true"] + * {
+  display: block;
+}
+
+/* Melhor contraste para placeholders */
+::placeholder {
+  color: #6b7280;
+  opacity: 1;
+}
+
+.dark ::placeholder {
+  color: #9ca3af;
+}
+
+/* Melhor contraste para textos primários em fundos claros */
+.text-primary-contrast {
+  color: #1e40af !important; /* Azul escuro com melhor contraste */
+}
+
+.dark .text-primary-contrast {
+  color: #60a5fa !important; /* Azul claro para modo escuro */
+}
+
+/* Links com melhor contraste */
+a[class*="text-[var(--primary)]"],
+.text-primary-link {
+  color: #1e40af !important;
+  font-weight: 600;
+}
+
+.dark a[class*="text-[var(--primary)]"],
+.dark .text-primary-link {
+  color: #60a5fa !important;
+}
+
+/* Melhorar contraste de todos os textos com var(--primary) em fundos claros */
+:root {
+  --primary-high-contrast: #1e40af; /* Azul escuro para melhor contraste */
+  --primary-dark-high-contrast: #1e3a8a; /* Azul ainda mais escuro */
+}
+
+.dark {
+  --primary-high-contrast: #60a5fa; /* Azul claro para modo escuro */
+  --primary-dark-high-contrast: #93c5fd; /* Azul mais claro para modo escuro */
+}
+
+/* Aplicar automaticamente em spans e elementos com text-[var(--primary)] */
+span[class*="text-[var(--primary)]"],
+h1 span[style*="color"],
+h2 span[style*="color"],
+h3 span[style*="color"] {
+  color: var(--primary-high-contrast) !important;
+}
+
+/* Melhorar contraste de textos "muted" */
+:root {
+  --muted-high-contrast: #374151; /* Cinza muito escuro para melhor contraste */
+  --text-high-contrast: #111827; /* Quase preto */
+}
+
+.dark {
+  --muted-high-contrast: #e5e7eb; /* Cinza muito claro para modo escuro */
+  --text-high-contrast: #f9fafb; /* Quase branco */
+}
+
+/* Aplicar melhor contraste em textos muted */
+.text-\[var\(--muted\)\],
+[class*="text-[var(--muted)]"] {
+  color: var(--muted-high-contrast) !important;
+  font-weight: 600;
+}
+
+/* Melhorar contraste de labels e textos pequenos */
+.text-xs,
+.text-sm {
+  font-weight: 600; /* Tornar mais legível e escuro */
+}
+
+/* Garantir contraste máximo em cards e modais */
+.bg-white .text-xs,
+.bg-white .text-sm,
+.bg-gray-50 .text-xs,
+.bg-gray-50 .text-sm {
+  color: #1f2937 !important; /* Cinza muito escuro */
+  font-weight: 600;
+}
+
+.dark .bg-gray-800 .text-xs,
+.dark .bg-gray-800 .text-sm,
+.dark .bg-gray-700 .text-xs,
+.dark .bg-gray-700 .text-sm {
+  color: #f3f4f6 !important; /* Cinza muito claro */
+  font-weight: 600;
+}
+
+/* Melhorar contraste de títulos e headings */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-high-contrast) !important;
+  font-weight: 700;
+}
+
+/* Garantir que textos em fundos claros sejam escuros */
+.bg-white *,
+.bg-gray-50 *,
+.bg-blue-50 * {
+  --tw-text-opacity: 1;
+}
+
+.bg-white .text-gray-700,
+.bg-gray-50 .text-gray-700,
+.bg-blue-50 .text-gray-700 {
+  color: #1f2937 !important;
+}
+
+/* Garantir que textos em fundos escuros sejam claros */
+.dark .bg-gray-800 *,
+.dark .bg-gray-700 * {
+  --tw-text-opacity: 1;
+}
+
+.dark .bg-gray-800 .text-gray-300,
+.dark .bg-gray-700 .text-gray-300 {
+  color: #f3f4f6 !important;
+}
+
+/* Status de validação de formulário */
+[aria-invalid="true"] {
+  border-color: #dc2626 !important;
+  background-color: #fef2f2;
+}
+
+.dark [aria-invalid="true"] {
+  background-color: #7f1d1d;
+}
+
+[aria-invalid="false"] {
+  border-color: #10b981 !important;
+}
+
+/* Mensagem de erro de campo */
+.field-error {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dark .field-error {
+  color: #fca5a5;
+}
