@@ -16,9 +16,9 @@
 // ============================================================
 // CONFIGURAÇÕES - ALTERE AQUI
 // ============================================================
-const char* DEFAULT_SSID = "AAPM";
-const char* DEFAULT_PASSWORD = "alunosenai";
-const char* SERVER_HOST = "172.20.10.2";
+const char* DEFAULT_SSID = "iPhone de Kauã";
+const char* DEFAULT_PASSWORD = "kaua1234";
+const char *SERVER_HOST = "monitoramentoml.up.railway.app";
 const int SERVER_PORT = 8000;
 
 // ============================================================
